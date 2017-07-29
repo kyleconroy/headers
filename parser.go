@@ -16,12 +16,15 @@ const eof = -1
 
 // XXX: Add a specific error message type
 func ParseDirectives(input string) (map[string]string, error) {
-	p := parser{input: input, r: int(input[0]), output: map[string]string{}}
-	return p.parse()
+	return newParser(input).parse()
 }
 
 func newParser(input string) *parser {
-	return &parser{input: input, r: int(input[0]), output: map[string]string{}}
+	r := 0
+	if input != "" {
+		r = int(input[0])
+	}
+	return &parser{input: input, r: r, output: map[string]string{}}
 }
 
 func (p *parser) accept(r int) bool {
@@ -58,6 +61,9 @@ func (p *parser) expect(s int) bool {
 }
 
 func (p *parser) parse() (map[string]string, error) {
+	if p.r == 0 {
+		return p.output, nil
+	}
 	for {
 		if p.directive(); p.done() {
 			return p.output, p.err

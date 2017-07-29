@@ -4,6 +4,7 @@ import "testing"
 
 func TestValid(t *testing.T) {
 	for _, test := range []string{
+		"",
 		"foo",
 		"foo;",
 		"foo; bar;",
