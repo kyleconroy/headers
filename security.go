@@ -199,3 +199,5 @@ func (h ContentTypeOptions) Value() string {
 func (h *ContentTypeOptions) Parse(hdr string) error {
 	return nil
 }
+
+var _ Header = &ContentTypeOptions{}

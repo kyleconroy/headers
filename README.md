@@ -12,7 +12,7 @@ dep ensure stackmachine.com/headers
 ## Usage
 
 ```go
-headers.Set(r, AccessControlMaxAge(time.Minute * 3))
+headers.Set(r, headers.AccessControlMaxAge(time.Minute * 3))
 ```
 
 ```go
@@ -45,5 +45,3 @@ func main() {
 	http.ListenAndServe(":8080", middleware(mux))
 }
 ```
-
-
