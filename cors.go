@@ -25,7 +25,7 @@ import (
 // (the Access-Control-Allow-Credentials header and in the XHR or Fetch request)
 // in order for the CORS request with credentials to succeed.
 //
-// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
+// https://mdn.io/Access-Control-Allow-Credentials
 type AccessControlAllowCredentials struct {
 }
 

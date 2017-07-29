@@ -9,12 +9,13 @@ import (
 )
 
 // The HTTP Strict-Transport-Security response header (often abbreviated as
-// HSTS) is a security feature that lets a web site tell browsers that it should
-// only be communicated with using HTTPS, instead of using HTTP.
+// HSTS) is a security feature that lets a web site tell browsers that it
+// should only be communicated with using HTTPS, instead of using HTTP.
 //
-// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security#Preloading_Strict_Transport_Security
+// https://mdn.io/Strict-Transport-Security
 type StrictTransportSecurity struct {
-	// The duration that the browser should remember that this site is only to be accessed using HTTPS.
+	// The duration that the browser should remember that this site is only to
+	// be accessed using HTTPS.
 	MaxAge time.Duration
 	// If true, this rule applies to all of the site's subdomains as well.
 	IncludeSubdomains bool
@@ -23,9 +24,6 @@ type StrictTransportSecurity struct {
 	// domain using an insecure connection. While the service is hosted by Google,
 	// all browsers have stated an intent to use (or actually started using) the
 	// preload list.
-
-	// Information regarding the HSTS preload list in Chrome : https://www.chromium.org/hsts
-	// Consultation of the Firefox HSTS preload list : https://dxr.mozilla.org/comm-central/source/mozilla/security/manager/ssl/nsSTSPreloadList.inc
 	Preload bool
 }
 
@@ -76,23 +74,25 @@ func (h *StrictTransportSecurity) Parse(hdr string) error {
 type FrameDirective int8
 
 const (
-	// The page cannot be displayed in a frame, regardless of the site attempting to do so.
+	// The page cannot be displayed in a frame, regardless of the site
+	// attempting to do so.
 	FrameDirectiveDeny FrameDirective = iota
-	// The page can only be displayed in a frame on the same origin as the page itself.
+	// The page can only be displayed in a frame on the same origin as the page
+	// itself.
 	FrameDirectiveSameOrigin
 	// The page can only be displayed in a frame on the specified origin.
 	FrameDirectiveAllowFrom
 )
 
-// The X-Frame-Options HTTP response header can be used to indicate whether or not
-// a browser should be allowed to render a page in a <frame>, <iframe> or <object>
-// . Sites can use this to avoid clickjacking attacks, by ensuring that their
-// content is not embedded into other sites.
+// The X-Frame-Options HTTP response header can be used to indicate whether or
+// not a browser should be allowed to render a page in a <frame>, <iframe> or
+// <object> . Sites can use this to avoid clickjacking attacks, by ensuring
+// that their content is not embedded into other sites.
 //
-// The added security is only provided if the user accessing the document is using
-// a browser supporting X-Frame-Options.
+// The added security is only provided if the user accessing the document is
+// using a browser supporting X-Frame-Options.
 //
-// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
+// https://mdn.io/X-Frame-Options
 type FrameOptions struct {
 	Directive FrameDirective
 	URL       *url.URL
@@ -139,10 +139,25 @@ func FrameOptionsAllow(uri *url.URL) Header {
 	return &FrameOptions{FrameDirectiveAllowFrom, uri}
 }
 
+// The HTTP X-XSS-Protection response header is a feature of Internet Explorer,
+// Chrome and Safari that stops pages from loading when they detect reflected
+// cross-site scripting (XSS) attacks. Although these protections are largely
+// unnecessary in modern browsers when sites implement a strong
+// Content-Security-Policy that disables the use of inline JavaScript
+// ('unsafe-inline'), they can still provide protections for users of older web
+// browsers that don't yet support CSP.
+//
+// https://mdn.io/X-XSS-Protection
 type XSSProtection struct {
+	// Disables XSS filtering.
 	Disabled bool
-	Block    bool
-	Report   string
+	// Enables XSS filtering. Rather than sanitizing the page, the browser will
+	// prevent rendering of the page if an attack is detected.
+	Block bool
+	// Enables XSS filtering. If a cross-site scripting attack is detected, the
+	// browser will sanitize the page and report the violation. This uses the
+	// functionality of the CSP report-uri directive to send a report.
+	Report string
 }
 
 func (h XSSProtection) Name() string {
@@ -185,6 +200,20 @@ func (h *XSSProtection) Parse(hdr string) error {
 	return nil
 }
 
+// The X-Content-Type-Options response HTTP header is a marker used by the
+// server to indicate that the MIME types advertised in the Content-Type
+// headers should not be changed and be followed. This allows to opt-out of
+// MIME type sniffing, or, in other words, it is a way to say that the
+// webmasters knew what they were doing.
+//
+// This header was introduced by Microsoft in IE 8 as a way for webmasters to
+// block content sniffing that was happening and could transform non-executable
+// MIME types into executable MIME types. Since then, other browsers have
+// introduced it, even if their MIME sniffing algorithms were less aggressive.
+//
+// Site security testers usually expect this header to be set.
+//
+// https://mdn.io/X-Content-Type-Options
 type ContentTypeOptions struct {
 }
 
