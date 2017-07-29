@@ -30,3 +30,11 @@ func TestDate(t *testing.T) {
 		{&Date{now}, now.Format(time.RFC1123)},
 	})
 }
+
+func TestDNT(t *testing.T) {
+	verify(t, []testcase{
+		{&DoNotTrack{}, "1"},
+		{&DoNotTrack{AllowTracking: false}, "1"},
+		{&DoNotTrack{AllowTracking: true}, "0"},
+	})
+}

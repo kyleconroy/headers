@@ -92,3 +92,36 @@ func (h *Date) Parse(hdr string) error {
 	*h = Date{t}
 	return nil
 }
+
+// The DNT (Do Not Track) request header indicates the user's tracking
+// preference. It lets users indicate whether they would prefer privacy rather
+// than personalized content.
+//
+// https://mdn.io/DNT
+type DoNotTrack struct {
+	// By default, the user prefers not to be tracked on the target site.
+	AllowTracking bool
+}
+
+func (h DoNotTrack) Name() string {
+	return "DNT"
+}
+
+func (h DoNotTrack) Value() string {
+	if h.AllowTracking {
+		return "0"
+	}
+	return "1"
+}
+
+func (h *DoNotTrack) Parse(hdr string) error {
+	switch hdr {
+	case "0":
+		h.AllowTracking = true
+	case "1":
+		h.AllowTracking = false
+	default:
+		return fmt.Errorf("DNT must be either '0' or '1', got '%s'", hdr)
+	}
+	return nil
+}
