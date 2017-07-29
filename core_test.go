@@ -38,3 +38,12 @@ func TestDNT(t *testing.T) {
 		{&DoNotTrack{AllowTracking: true}, "0"},
 	})
 }
+
+func TestRetryAfter(t *testing.T) {
+	now := time.Now()
+	verify(t, []testcase{
+		{&RetryAfter{}, "0"},
+		{&RetryAfter{Delay: 5 * time.Second}, "5"},
+		{&RetryAfter{Date: &now, Delay: 5 * time.Second}, now.Format(time.RFC1123)},
+	})
+}

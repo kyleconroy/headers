@@ -56,7 +56,7 @@ func (h Age) Name() string {
 }
 
 func (h Age) Value() string {
-	return strconv.Itoa(int(time.Duration(h.Cached).Seconds()))
+	return strconv.Itoa(int(h.Cached.Seconds()))
 }
 
 func (h *Age) Parse(hdr string) error {
@@ -124,4 +124,46 @@ func (h *DoNotTrack) Parse(hdr string) error {
 		return fmt.Errorf("DNT must be either '0' or '1', got '%s'", hdr)
 	}
 	return nil
+}
+
+// The Retry-After response HTTP header indicates how long the user agent
+// should wait before making a follow-up request. There are two main cases this
+// header is used:
+//
+// - When sent with a 503 (Service Unavailable) response, it indicates how long
+// the service is expected to be unavailable.
+//
+// - When sent with a redirect response, such as 301 (Moved Permanently), it
+// indicates the minimum time that the user agent is asked to wait before
+// issuing the redirected request.
+//
+// https://mdn.io/Retry-After
+type RetryAfter struct {
+	// A date after which to retry.
+	Date *time.Time
+	// Delay duration after the response is received.
+	Delay time.Duration
+}
+
+func (h RetryAfter) Name() string {
+	return "Retry-After"
+}
+
+func (h RetryAfter) Value() string {
+	if h.Date != nil {
+		return h.Date.Format(time.RFC1123)
+	}
+	return strconv.Itoa(int(h.Delay.Seconds()))
+}
+
+func (h *RetryAfter) Parse(hdr string) error {
+	if age, err := strconv.Atoi(hdr); err == nil {
+		*h = RetryAfter{Delay: time.Duration(age) * time.Second}
+		return nil
+	}
+	if t, err := time.Parse(time.RFC1123, hdr); err == nil {
+		*h = RetryAfter{Date: &t}
+		return nil
+	}
+	return fmt.Errorf("The value for Retry-After must be an integer or date; got %s", hdr)
 }
