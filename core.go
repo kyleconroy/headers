@@ -67,3 +67,28 @@ func (h *Age) Parse(hdr string) error {
 	*h = Age{time.Duration(age) * time.Second}
 	return nil
 }
+
+// The Date general HTTP header contains the date and time at which the message
+// was originated.
+//
+// https://mdn.io/HTTP/Date
+type Date struct {
+	Time time.Time
+}
+
+func (h Date) Name() string {
+	return "Date"
+}
+
+func (h Date) Value() string {
+	return h.Time.Format(time.RFC1123)
+}
+
+func (h *Date) Parse(hdr string) error {
+	t, err := time.Parse(time.RFC1123, hdr)
+	if err != nil {
+		return fmt.Errorf("Invalid Date value; got %s", hdr)
+	}
+	*h = Date{t}
+	return nil
+}

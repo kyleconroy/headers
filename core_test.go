@@ -22,3 +22,11 @@ func TestAge(t *testing.T) {
 		{&Age{1 * time.Hour}, "3600"},
 	})
 }
+
+func TestDate(t *testing.T) {
+	now := time.Now()
+	verify(t, []testcase{
+		{&Date{}, "Mon, 01 Jan 0001 00:00:00 UTC"},
+		{&Date{now}, now.Format(time.RFC1123)},
+	})
+}
