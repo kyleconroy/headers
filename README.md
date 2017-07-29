@@ -1,12 +1,15 @@
 # stakmachine/headers
 [![GoDoc](https://godoc.org/stackmachine.com/headers?status.svg)](https://godoc.org/stackmachine.com/headers) [![Build Status](https://travis-ci.org/stackmachine/headers.svg?branch=master)](https://travis-ci.org/stackmachine/headers)
 
-Structs for headers
+stackmachine/headers is a type-safe API for manipulating HTTP headers. Say goodbye to stringly-typed, unsafe code.
 
-I want to be able to do three things:
+## Install
 
-Parse the header into the struct
-WRite it into the header
+```
+dep ensure stackmachine.com/headers
+```
+
+## Usage
 
 ```go
 headers.Set(r, AccessControlMaxAge(time.Minute * 3))
@@ -43,8 +46,4 @@ func main() {
 }
 ```
 
-## Install
 
-```
-dep ensure stackmachine.com/headers
-```
