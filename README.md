@@ -6,7 +6,7 @@ stackmachine/headers is a type-safe API for manipulating HTTP headers. Say goodb
 ## Install
 
 ```
-dep ensure stackmachine.com/headers
+dep ensure github.com/stackmachine/headers
 ```
 
 ## Usage
@@ -23,7 +23,7 @@ import (
 	"net/http"
 	"time"
 
-	"stackmachine.com/headers"
+	"github.com/stackmachine/headers"
 )
 
 func middleware(next http.Handler) http.Handler {
