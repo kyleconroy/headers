@@ -1,33 +1,37 @@
 package headers
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type parser struct {
 	index  int
-	input  string
-	r      int
+	chars  []rune
+	r      rune
 	err    error
-	cname  string
-	cvalue string
+	k, v   strings.Builder
 	output map[string]string
+	eof    bool
 }
-
-const eof = -1
 
 // XXX: Add a specific error message type
 func ParseDirectives(input string) (map[string]string, error) {
+	if input == "" {
+		return map[string]string{}, nil
+	}
 	return newParser(input).parse()
 }
 
 func newParser(input string) *parser {
-	r := 0
-	if input != "" {
-		r = int(input[0])
+	var chars []rune
+	for _, c := range input {
+		chars = append(chars, c)
 	}
-	return &parser{input: input, r: r, output: map[string]string{}}
+	return &parser{chars: chars, r: chars[0], output: map[string]string{}}
 }
 
-func (p *parser) accept(r int) bool {
+func (p *parser) accept(r rune) bool {
 	if p.r == r {
 		p.next()
 		return true
@@ -37,22 +41,22 @@ func (p *parser) accept(r int) bool {
 
 func (p *parser) next() {
 	p.index++
-	if p.index == len(p.input) {
-		p.r = eof
+	if p.index == len(p.chars) {
+		p.eof = true
 		return
 	}
-	p.r = int(p.input[p.index])
+	p.r = p.chars[p.index]
 }
 
 func (p *parser) done() bool {
-	return p.r == eof || p.err != nil
+	return p.eof || p.err != nil
 }
 
 func (p *parser) stop(msg string) {
 	p.err = fmt.Errorf(msg)
 }
 
-func (p *parser) expect(s int) bool {
+func (p *parser) expect(s rune) bool {
 	if p.accept(s) {
 		return true
 	}
@@ -80,17 +84,17 @@ func (p *parser) directive() {
 	if p.accept('=') {
 		p.value()
 	}
-	if p.cname != "" {
-		p.output[p.cname] = p.cvalue
-		p.cname = ""
-		p.cvalue = ""
+	if p.k.Len() > 0 {
+		p.output[p.k.String()] = p.v.String()
+		p.k.Reset()
+		p.v.Reset()
 	}
 	p.lws()
 }
 
 func (p *parser) lws() {
 	for {
-		if p.r == ' ' || p.r == 9 {
+		if p.r == ' ' || p.r == rune(9) {
 			p.next()
 			continue
 		}
@@ -99,23 +103,28 @@ func (p *parser) lws() {
 }
 
 func (p *parser) name() {
-	p.cname = ""
+	p.k.Reset()
 	for {
+		if p.eof {
+			return
+		}
 		switch p.r {
-		case eof, ';', ' ', 9, '=':
+		case ';', ' ', rune(9), '=':
 			return
 		case '(', ')', '<', '>', '@', ',', ':', '\\', '/', '[', ']', '?', '{', '}', '"':
 			p.stop("illegal char in name")
 			return
 		default:
-			p.cname += string(p.r)
+			if _, err := p.k.WriteRune(p.r); err != nil {
+				panic(err)
+			}
 			p.next()
 		}
 	}
 }
 
 func (p *parser) value() {
-	p.cvalue = ""
+	p.v.Reset()
 	quoted := p.accept('"')
 	for {
 		if p.done() {
@@ -130,8 +139,11 @@ func (p *parser) value() {
 			}
 			p.accept('\\')
 		} else {
+			if p.eof {
+				return
+			}
 			switch p.r {
-			case eof, ';', ' ', 9:
+			case ';', ' ', rune(9):
 				return
 			case '(', ')', '<', '>', '@', ',', ':', '\\', '/', '[', ']', '?', '{', '}', '=', '"':
 				p.stop("illegal char in name")
@@ -139,7 +151,9 @@ func (p *parser) value() {
 			}
 		}
 		if !p.done() {
-			p.cvalue += string(p.r)
+			if _, err := p.v.WriteRune(p.r); err != nil {
+				panic(err)
+			}
 			p.next()
 		}
 	}

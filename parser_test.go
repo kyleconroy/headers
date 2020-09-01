@@ -14,10 +14,10 @@ func TestValid(t *testing.T) {
 		"foo; bar; baz=\"3\\\"\"",
 		"foo=",
 	} {
-		t.Run(test, func(t *testing.T) {
-			p := newParser(test)
-			if _, err := p.parse(); err != nil {
-				t.Errorf("%#v", p)
+		input := test
+		t.Run(input, func(t *testing.T) {
+			_, err := ParseDirectives(input)
+			if err != nil {
 				t.Errorf("%s", err)
 			}
 		})
@@ -31,9 +31,9 @@ func TestInvalid(t *testing.T) {
 		"foo; bar; baz=\"3\\",
 	} {
 		t.Run(test, func(t *testing.T) {
-			p := newParser(test)
-			if _, err := p.parse(); err == nil {
-				t.Errorf("expected err %#v", p)
+			_, err := ParseDirectives(test)
+			if err == nil {
+				t.Errorf("expected err")
 			}
 		})
 	}
