@@ -3,12 +3,6 @@
 
 stackmachine/headers is a type-safe API for manipulating HTTP headers. Say goodbye to stringly-typed, unsafe code.
 
-## Install
-
-```
-dep ensure github.com/stackmachine/headers
-```
-
 ## Usage
 
 ```go
