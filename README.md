@@ -6,36 +6,37 @@ stackmachine/headers is a type-safe API for manipulating HTTP headers. Say goodb
 ## Usage
 
 ```go
-headers.Set(r, headers.AccessControlMaxAge(time.Minute * 3))
+headers.Set(r, &headers.AccessControlMaxAge(time.Minute * 3))
 ```
 
 ```go
 package main
 
 import (
-	"fmt"
-	"net/http"
-	"time"
+  "fmt"
+  "net/http"
+  "time"
 
-	"github.com/stackmachine/headers"
+  "github.com/stackmachine/headers"
 )
 
 func middleware(next http.Handler) http.Handler {
-	return func(w http.ResponseWriter, r *http.Request) {
-		headers.Set(w, headers.StrictTransportSecurity{
-			MaxAge:            time.Hour * 24,
-			IncludeSubDomains: true,
-			Preload:           true,
-		})
-		next.ServeHTTP(w, r)
-	}
+  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    headers.Set(w, &headers.StrictTransportSecurity{
+      MaxAge:            time.Hour * 24,
+      IncludeSubdomains: true,
+      Preload:           true,
+    })
+    next.ServeHTTP(w, r)
+  })
 }
 
 func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		fmt.Fprintf(w, "Welcome :D")
-	})
-	http.ListenAndServe(":8080", middleware(mux))
+  mux := http.NewServeMux()
+  mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+    fmt.Fprintf(w, "Welcome :D")
+  })
+  fmt.Println("listening on :8080")
+  http.ListenAndServe(":8080", middleware(mux))
 }
 ```
