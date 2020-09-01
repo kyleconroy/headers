@@ -47,7 +47,6 @@ func (h *StrictTransportSecurity) Parse(hdr string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(directives)
 	val := StrictTransportSecurity{}
 	for name, value := range directives {
 		name = strings.TrimSpace(strings.ToLower(name))
