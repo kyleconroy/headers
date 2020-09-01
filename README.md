@@ -1,5 +1,5 @@
 # stakmachine/headers
-[![GoDoc](https://godoc.org/stackmachine.com/headers?status.svg)](https://godoc.org/stackmachine.com/headers) [![Build Status](https://travis-ci.org/stackmachine/headers.svg?branch=master)](https://travis-ci.org/stackmachine/headers)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/stackmachine/headers)](https://pkg.go.dev/github.com/stackmachine/headers) ![GithubActions](https://github.com/stackmachine/headers/workflows/ci/badge.svg?branch=main)
 
 stackmachine/headers is a type-safe API for manipulating HTTP headers. Say goodbye to stringly-typed, unsafe code.
 
